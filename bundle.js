@@ -214,7 +214,7 @@ var h = (0, _slateHyperscript.createHyperscript)({
 // eslint-disable-next-line no-template-curly-in-string
 /** @jsx h */
 /* eslint-disable import/no-extraneous-dependencies */
-var content = '{$ User-id}, ${ User-cat}, {$ User-something }....';
+var content = '{$ User-id}, {$ User-cat}, {$ User-something }....';
 
 var value = h(
     'value',
@@ -225,7 +225,10 @@ var value = h(
         h(
             'paragraph',
             null,
-            'This page is a basic example of Slate + slate-poor-mentions plugin'
+            'This page is a basic example of Slate + slate-poor-mentions plugin. Mentions are started with ',
+            '{$',
+            ' and end with ',
+            '}'
         ),
         h(
             'paragraph',
