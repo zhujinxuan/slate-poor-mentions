@@ -1282,7 +1282,7 @@ function getExtendedRange(mentions, beforeMatchRegex, afterMatchRegex) {
         }
         var endRange = (0, _findMentionRange.findMentionRangeAt)(beforeMatchRegex, afterMatchRegex, endText, endOffset);
         if (endRange) {
-            var _matchingText = endText.text.substring(endRange.startOffset, endRange, endOffset);
+            var _matchingText = endText.text.substring(endRange.startOffset, endRange.endOffset);
             if (mentions.find(function (x) {
                 return x.name === _matchingText;
             })) {
