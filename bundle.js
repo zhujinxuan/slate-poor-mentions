@@ -1191,7 +1191,8 @@ function createMentionPlugin(options) {
         portals: { MentionMenu: MentionMenu },
         utils: {
             findMentionRange: findMentionRange,
-            getExtendedRange: getExtendedRange
+            getExtendedRange: getExtendedRange,
+            isActive: updater.isActive
         },
         decorateNode: (0, _createDecorateNode2.default)(mentions, matchInBetweenRegex, decorationMark),
         renderMark: (0, _createRenderMark2.default)([decorationMark, cursorDecorationMark], [classNameForDecoration, classNameForCursorDecoration]),
