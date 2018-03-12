@@ -1264,10 +1264,12 @@ var _findMentionRange = require('./findMentionRange');
 
 function getExtendedRange(mentions, beforeMatchRegex, afterMatchRegex) {
     var extendRange = function extendRange(node, range) {
-        var startKey = range.startKey,
-            endKey = range.endKey;
-        var startOffset = range.startOffset,
-            endOffset = range.endOffset;
+        var _range = range,
+            startKey = _range.startKey,
+            endKey = _range.endKey;
+        var _range2 = range,
+            startOffset = _range2.startOffset,
+            endOffset = _range2.endOffset;
 
         var startText = node.getDescendant(startKey);
         var endText = node.getDescendant(endKey);
@@ -1292,12 +1294,8 @@ function getExtendedRange(mentions, beforeMatchRegex, afterMatchRegex) {
         }
 
         if (range.startOffset === startOffset && range.endOffset === endOffset) return range;
-        return _slate.Range.create({
-            anchorKey: startKey,
-            focusKey: endKey,
-            anchorOffset: startOffset,
-            focusOffset: endOffset
-        });
+        if (range.isBackward) range = range.flip;
+        return range.moveAnchorTo(startKey, startOffset).moveFocusTo(endKey, endOffset);
     };
 
     return function (node, range) {
