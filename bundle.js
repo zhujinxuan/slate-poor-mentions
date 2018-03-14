@@ -957,6 +957,8 @@ Object.defineProperty(exports, "__esModule", {
 
 require('slate');
 
+var _type = require('./type');
+
 function halfClosedFindMention(value, findMentionRange, beforeMatchRegex) {
     if (!value.isFocused) return null;
     if (value.isExpanded) return null;
@@ -976,9 +978,22 @@ function halfClosedFindMention(value, findMentionRange, beforeMatchRegex) {
     return selection.moveAnchor(key, anchorOffset);
 }
 
-
-function createOnChangeDecoration(findMentionRange, beforeMatchRegex, decoMark) {
+function createOnChangeDecoration(findMentionRange, updater, beforeMatchRegex, decoMark) {
     return function (change) {
+        if (!updater.isActive) return;
+        if (!updater.isActive()) {
+            var _decorations = change.value.decorations;
+
+            if (!_decorations) return;
+            var nextDecorations = _decorations.filter(function (x) {
+                return !x.marks || !x.marks.find(function (m) {
+                    return m.type === decoMark.type;
+                });
+            });
+            if (nextDecorations.size === _decorations.size) return;
+            change.setOperationFlag('save', false).setValue({ decorations: nextDecorations }).setOperationFlag('save', true);
+            return;
+        }
         var value = change.value;
 
 
@@ -986,13 +1001,13 @@ function createOnChangeDecoration(findMentionRange, beforeMatchRegex, decoMark) 
         if (!range && !value.decorations) return;
 
         if (!range) {
-            var nextDecorations = value.decorations.filter(function (x) {
+            var _nextDecorations = value.decorations.filter(function (x) {
                 return !x.marks || !x.marks.find(function (m) {
                     return m.type === decoMark.type;
                 });
             });
-            if (nextDecorations.size === value.decorations.size) return;
-            change.setOperationFlag('save', false).setValue({ decorations: nextDecorations }).setOperationFlag('save', true);
+            if (_nextDecorations.size === value.decorations.size) return;
+            change.setOperationFlag('save', false).setValue({ decorations: _nextDecorations }).setOperationFlag('save', true);
             return;
         }
 
@@ -1028,7 +1043,7 @@ function createOnChangeDecoration(findMentionRange, beforeMatchRegex, decoMark) 
 }
 exports.default = createOnChangeDecoration;
 
-},{"slate":401}],13:[function(require,module,exports){
+},{"./type":16,"slate":401}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1196,7 +1211,7 @@ function createMentionPlugin(options) {
         },
         decorateNode: (0, _createDecorateNode2.default)(mentions, matchInBetweenRegex, decorationMark),
         renderMark: (0, _createRenderMark2.default)([decorationMark, cursorDecorationMark], [classNameForDecoration, classNameForCursorDecoration]),
-        onChange: (0, _createOnChangeDecoration2.default)(findMentionRange, beforeMatchRegex, cursorDecorationMark)
+        onChange: (0, _createOnChangeDecoration2.default)(findMentionRange, updater, beforeMatchRegex, cursorDecorationMark)
     };
 }
 exports.default = createMentionPlugin;
