@@ -319,6 +319,8 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+require('../type');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -361,7 +363,10 @@ var MentionItem = function (_Component) {
         value: function render() {
             var _props = this.props,
                 mention = _props.mention,
-                selected = _props.selected;
+                selected = _props.selected,
+                MentionItemChild = _props.MentionItemChild;
+
+            var children = MentionItemChild ? _react2.default.createElement(MentionItemChild, mention) : mention.name;
             var onMouseDown = this.onMouseDown,
                 onMouseEnter = this.onMouseEnter;
 
@@ -373,7 +378,7 @@ var MentionItem = function (_Component) {
                     onMouseDown: onMouseDown,
                     onMouseEnter: onMouseEnter
                 },
-                mention.name
+                children
             );
         }
     }]);
@@ -383,12 +388,14 @@ var MentionItem = function (_Component) {
 
 exports.default = MentionItem;
 
-},{"react":392}],7:[function(require,module,exports){
+},{"../type":16,"react":392}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -532,7 +539,8 @@ var MentionMenu = function (_Component) {
             var _props = this.props,
                 mentions = _props.mentions,
                 name = _props.name,
-                selectMention = _props.selectMention;
+                selectMention = _props.selectMention,
+                MentionItemChild = _props.MentionItemChild;
 
             var isOpened = mentions && mentions.length > 0;
 
@@ -543,13 +551,12 @@ var MentionMenu = function (_Component) {
                     'ul',
                     { className: 'RichEditor-mention-menu' },
                     mentions.map(function (mention) {
-                        return _react2.default.createElement(_MentionItem2.default, {
+                        return _react2.default.createElement(_MentionItem2.default, _extends({
                             selected: mention.name === name,
-                            mention: mention,
                             key: mention.name,
                             confirmMention: _this2.confirmMention,
                             selectMention: selectMention
-                        });
+                        }, { mention: mention, MentionItemChild: MentionItemChild }));
                     })
                 )
             );
@@ -662,7 +669,8 @@ var MentionMenuAtRange = function (_Component) {
                 name = _props.name,
                 selectMention = _props.selectMention,
                 submitChange = _props.submitChange,
-                changeHOF = _props.changeHOF;
+                changeHOF = _props.changeHOF,
+                MentionItemChild = _props.MentionItemChild;
 
             return _react2.default.createElement(_MentionMenu2.default, {
                 value: value,
@@ -670,7 +678,8 @@ var MentionMenuAtRange = function (_Component) {
                 name: name,
                 selectMention: selectMention,
                 submitChange: submitChange,
-                changeHOF: changeHOF
+                changeHOF: changeHOF,
+                MentionItemChild: MentionItemChild
             });
         }
     }]);
@@ -841,7 +850,8 @@ var MentionMenuContainer = function (_Component) {
                 changeHOF = this.changeHOF;
             var _props2 = this.props,
                 submitChange = _props2.submitChange,
-                value = _props2.value;
+                value = _props2.value,
+                MentionItemChild = _props2.MentionItemChild;
 
             return _react2.default.createElement(_MentionMenuAtRange2.default, {
                 mentions: mentions,
@@ -849,7 +859,8 @@ var MentionMenuContainer = function (_Component) {
                 value: value,
                 selectMention: selectMention,
                 submitChange: submitChange,
-                changeHOF: changeHOF
+                changeHOF: changeHOF,
+                MentionItemChild: MentionItemChild
             });
         }
     }]);
@@ -880,7 +891,7 @@ var _type = require('../type');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function createMentionBundle(getMentions) {
+function createMentionBundle(getMentions, MentionItemChild) {
     var updater = {
         isActive: function isActive() {
             return false;
@@ -895,13 +906,20 @@ function createMentionBundle(getMentions) {
             return undefined;
         }
     };
-    return {
-        MentionMenu: function MentionMenu(props) {
-            var value = props.value,
-                submitChange = props.submitChange;
+    var MentionMenu = function MentionMenu(props) {
+        var value = props.value,
+            submitChange = props.submitChange;
 
-            return _react2.default.createElement(_MentionMenuContainer2.default, { updater: updater, value: value, submitChange: submitChange, getMentions: getMentions });
-        },
+        return _react2.default.createElement(_MentionMenuContainer2.default, {
+            updater: updater,
+            value: value,
+            submitChange: submitChange,
+            getMentions: getMentions,
+            MentionItemChild: MentionItemChild
+        });
+    };
+    return {
+        MentionMenu: MentionMenu,
         updater: updater
     };
 }
@@ -1131,6 +1149,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _slate = require('slate');
 
+require('react');
+
 var _createMentionBundle2 = require('./components/createMentionBundle');
 
 var _createMentionBundle3 = _interopRequireDefault(_createMentionBundle2);
@@ -1163,6 +1183,8 @@ var _createOnChangeDecoration = require('./createOnChangeDecoration');
 
 var _createOnChangeDecoration2 = _interopRequireDefault(_createOnChangeDecoration);
 
+require('./type');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function createMentionPlugin(options) {
@@ -1191,13 +1213,14 @@ function createMentionPlugin(options) {
         afterFormatMatcherRegex = _options$afterFormatM === undefined ? / *} *$/ : _options$afterFormatM;
     var _options$matchInBetwe = options.matchInBetweenRegex,
         matchInBetweenRegex = _options$matchInBetwe === undefined ? /{\$[^{}$]+}/g : _options$matchInBetwe;
+    var MentionItemChild = options.MentionItemChild;
 
     var findMentionRange = (0, _findMentionRange2.default)(beforeMatchRegex, afterMatchRegex);
     var getExtendedRange = (0, _getExtendedRange2.default)(mentions, beforeMatchRegex, afterMatchRegex);
 
     var getMentions = (0, _compileMentions2.default)(findMentionRange, beforeFormatMatcherRegex, afterFormatMatcherRegex, mentions);
 
-    var _createMentionBundle = (0, _createMentionBundle3.default)(getMentions),
+    var _createMentionBundle = (0, _createMentionBundle3.default)(getMentions, MentionItemChild),
         MentionMenu = _createMentionBundle.MentionMenu,
         updater = _createMentionBundle.updater;
 
@@ -1216,7 +1239,7 @@ function createMentionPlugin(options) {
 }
 exports.default = createMentionPlugin;
 
-},{"./compileMentions":5,"./components/createMentionBundle":10,"./createDecorateNode":11,"./createOnChangeDecoration":12,"./createOnKeyDown":13,"./createRenderMark":14,"./util/findMentionRange":17,"./util/getExtendedRange":18,"slate":401}],16:[function(require,module,exports){
+},{"./compileMentions":5,"./components/createMentionBundle":10,"./createDecorateNode":11,"./createOnChangeDecoration":12,"./createOnKeyDown":13,"./createRenderMark":14,"./type":16,"./util/findMentionRange":17,"./util/getExtendedRange":18,"react":392,"slate":401}],16:[function(require,module,exports){
 'use strict';
 
 require('slate');
