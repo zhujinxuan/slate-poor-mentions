@@ -278,10 +278,7 @@ function compileStringArrays(beforeFormatMatcherRegex, afterFormatMatcherRegex, 
 }
 
 function compileMentions(findMentionRange, beforeFormatMatcherRegex, afterFormatMatcherRegex, mentions) {
-    var mentionsStringArray = mentions.filter(function (mention) {
-        return typeof mention.name === 'string';
-    });
-    var getMentions = compileStringArrays(beforeFormatMatcherRegex, afterFormatMatcherRegex, mentionsStringArray);
+    var getMentions = compileStringArrays(beforeFormatMatcherRegex, afterFormatMatcherRegex, mentions);
     return function (value) {
         var range = findMentionRange(value);
 
@@ -366,7 +363,7 @@ var MentionItem = function (_Component) {
                 selected = _props.selected,
                 MentionItemChild = _props.MentionItemChild;
 
-            var children = MentionItemChild ? _react2.default.createElement(MentionItemChild, mention) : mention.name;
+            var children = _react2.default.createElement(MentionItemChild, mention);
             var onMouseDown = this.onMouseDown,
                 onMouseEnter = this.onMouseEnter;
 
@@ -581,7 +578,7 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-require('slate');
+var _slate = require('slate');
 
 require('../type');
 
@@ -782,7 +779,7 @@ var MentionMenuContainer = function (_Component) {
                 index = ((lastIndex === -1 ? 0 : lastIndex) + offset + mentions.length) % mentions.length;
             }
 
-            if (index > -1) {
+            if (index > -1 && mentions[index]) {
                 _this.setState({ name: mentions[index].name });
             }
         };
@@ -857,8 +854,8 @@ var MentionMenuContainer = function (_Component) {
                 mentions: mentions,
                 name: name,
                 value: value,
-                selectMention: selectMention,
                 submitChange: submitChange,
+                selectMention: selectMention,
                 changeHOF: changeHOF,
                 MentionItemChild: MentionItemChild
             });
@@ -935,6 +932,8 @@ Object.defineProperty(exports, "__esModule", {
 
 require('slate');
 
+require('./type');
+
 function createDecorateNode(mentions, matchInBetween, decoMark) {
     return function (node) {
         var names = mentions.map(function (x) {
@@ -966,7 +965,7 @@ function createDecorateNode(mentions, matchInBetween, decoMark) {
 }
 exports.default = createDecorateNode;
 
-},{"slate":401}],12:[function(require,module,exports){
+},{"./type":16,"slate":401}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1149,8 +1148,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _slate = require('slate');
 
-require('react');
-
 var _createMentionBundle2 = require('./components/createMentionBundle');
 
 var _createMentionBundle3 = _interopRequireDefault(_createMentionBundle2);
@@ -1190,10 +1187,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function createMentionPlugin(options) {
     var _options$decorationMa = options.decorationMarkType,
         decorationMarkType = _options$decorationMa === undefined ? 'mention-decoration' : _options$decorationMa;
+    var mentions = options.mentions;
 
-    var mentions = options.mentions.map(function (x) {
-        return { name: x.name };
-    });
     var decorationMark = _slate.Mark.create(decorationMarkType);
     var _options$classNameFor = options.classNameForDecoration,
         classNameForDecoration = _options$classNameFor === undefined ? decorationMark.type : _options$classNameFor;
@@ -1213,7 +1208,10 @@ function createMentionPlugin(options) {
         afterFormatMatcherRegex = _options$afterFormatM === undefined ? / *} *$/ : _options$afterFormatM;
     var _options$matchInBetwe = options.matchInBetweenRegex,
         matchInBetweenRegex = _options$matchInBetwe === undefined ? /{\$[^{}$]+}/g : _options$matchInBetwe;
-    var MentionItemChild = options.MentionItemChild;
+    var _options$MentionItemC = options.MentionItemChild,
+        MentionItemChild = _options$MentionItemC === undefined ? function (mention) {
+        return mention.name;
+    } : _options$MentionItemC;
 
     var findMentionRange = (0, _findMentionRange2.default)(beforeMatchRegex, afterMatchRegex);
     var getExtendedRange = (0, _getExtendedRange2.default)(mentions, beforeMatchRegex, afterMatchRegex);
@@ -1237,14 +1235,17 @@ function createMentionPlugin(options) {
         onChange: (0, _createOnChangeDecoration2.default)(findMentionRange, updater, beforeMatchRegex, cursorDecorationMark)
     };
 }
+
 exports.default = createMentionPlugin;
 
-},{"./compileMentions":5,"./components/createMentionBundle":10,"./createDecorateNode":11,"./createOnChangeDecoration":12,"./createOnKeyDown":13,"./createRenderMark":14,"./type":16,"./util/findMentionRange":17,"./util/getExtendedRange":18,"react":392,"slate":401}],16:[function(require,module,exports){
+},{"./compileMentions":5,"./components/createMentionBundle":10,"./createDecorateNode":11,"./createOnChangeDecoration":12,"./createOnKeyDown":13,"./createRenderMark":14,"./type":16,"./util/findMentionRange":17,"./util/getExtendedRange":18,"slate":401}],16:[function(require,module,exports){
 'use strict';
 
 require('slate');
 
-},{"slate":401}],17:[function(require,module,exports){
+require('react');
+
+},{"react":392,"slate":401}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1300,6 +1301,8 @@ var _slate = require('slate');
 
 var _findMentionRange = require('./findMentionRange');
 
+require('../type');
+
 function getExtendedRange(mentions, beforeMatchRegex, afterMatchRegex) {
     var extendRange = function extendRange(node, range) {
         var _range = range,
@@ -1341,10 +1344,9 @@ function getExtendedRange(mentions, beforeMatchRegex, afterMatchRegex) {
         return extendRange(node, range);
     };
 }
-
 exports.default = getExtendedRange;
 
-},{"./findMentionRange":17,"slate":401}],19:[function(require,module,exports){
+},{"../type":16,"./findMentionRange":17,"slate":401}],19:[function(require,module,exports){
 (function (process){
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
