@@ -2,10 +2,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import React, { Component, type Node as ReactNode } from 'react';
-import { type Value, type Change, type Node } from 'slate';
+import { type Value, type Node } from 'slate';
 import { Editor } from 'slate-react';
-
-import createMentionPlugin from '../lib/';
+import createMentionPlugin from '../lib/slate-poor-mentions.es';
 
 type NodeProps = {
     node: Node,
@@ -31,29 +30,18 @@ type Props = {
     matchInBetweenRegex: RegExp,
     value: Value
 };
-type Portals = {
-    MentionMenu: (*) => ReactNode
-};
 
 class SlateEditor extends Component<Props, { value: Value }> {
     plugins: Array<*>;
-    portals: Portals;
-    submitChange: Change => *;
-    editorREF: Editor;
 
     constructor(props: Props) {
         super(props);
         const { value } = props;
         const mentionPlugin = createMentionPlugin(props);
         this.plugins = [mentionPlugin];
-        this.portals = { ...mentionPlugin.portals };
         this.submitChange = x => undefined;
         this.state = { value };
     }
-    setEditorComponent = (ref: Editor) => {
-        this.editorREF = ref;
-        this.submitChange = ref.change;
-    };
 
     onChange = ({ value }: { value: Value }) => {
         this.setState({
@@ -63,19 +51,16 @@ class SlateEditor extends Component<Props, { value: Value }> {
 
     render() {
         const { value } = this.state;
-        const { plugins, submitChange } = this;
-        const { MentionMenu } = this.portals;
+        const { plugins } = this;
         return (
             <div>
                 <Editor
-                    ref={this.setEditorComponent}
                     placeholder={'Enter some text...'}
                     renderNode={renderNode}
                     plugins={plugins}
                     value={value}
                     onChange={this.onChange}
                 />
-                <MentionMenu value={value} submitChange={submitChange} />
             </div>
         );
     }

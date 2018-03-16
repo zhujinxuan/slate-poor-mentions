@@ -73,9 +73,7 @@ var SlateEditor = function (_Component) {
         key: 'render',
         value: function render() {
             var value = this.state.value;
-            var plugins = this.plugins,
-                submitChange = this.submitChange;
-            var MentionMenu = this.portals.MentionMenu;
+            var plugins = this.plugins;
 
             return _react2.default.createElement(
                 'div',
@@ -87,8 +85,7 @@ var SlateEditor = function (_Component) {
                     plugins: plugins,
                     value: value,
                     onChange: this.onChange
-                }),
-                _react2.default.createElement(MentionMenu, { value: value, submitChange: submitChange })
+                })
             );
         }
     }]);
@@ -915,8 +912,21 @@ function createMentionBundle(getMentions, MentionItemChild) {
             MentionItemChild: MentionItemChild
         });
     };
+    var renderEditor = function renderEditor(props, editor) {
+        return _react2.default.createElement(
+            'div',
+            null,
+            _react2.default.createElement(
+                'div',
+                null,
+                props.children
+            ),
+            _react2.default.createElement(MentionMenu, { value: editor.value, submitChange: editor.change })
+        );
+    };
     return {
         MentionMenu: MentionMenu,
+        renderEditor: renderEditor,
         updater: updater
     };
 }
@@ -1219,12 +1229,12 @@ function createMentionPlugin(options) {
     var getMentions = (0, _compileMentions2.default)(findMentionRange, beforeFormatMatcherRegex, afterFormatMatcherRegex, mentions);
 
     var _createMentionBundle = (0, _createMentionBundle3.default)(getMentions, MentionItemChild),
-        MentionMenu = _createMentionBundle.MentionMenu,
+        renderEditor = _createMentionBundle.renderEditor,
         updater = _createMentionBundle.updater;
 
     return {
         onKeyDown: (0, _createOnKeyDown2.default)(updater),
-        portals: { MentionMenu: MentionMenu },
+        renderEditor: renderEditor,
         utils: {
             findMentionRange: findMentionRange,
             getExtendedRange: getExtendedRange,
