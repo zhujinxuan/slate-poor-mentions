@@ -43,5 +43,8 @@
   color: #e6f3ff;
 }
 
+.RichEditor-mention-menu li span.mention-matched-text{
+  color: red;
+}
 
-/*# sourceMappingURL=main-9a28a392956ca58b00cf45d80291b1ef.css.map*/
+/*# sourceMappingURL=main-980c306306793a8c87fcc8e68cea32ea.css.map*/
